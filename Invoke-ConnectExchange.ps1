@@ -1,4 +1,4 @@
- Function Connect-Exchange {
+ Function Invoke-ConnectExchange {
     <#  
         .SYNOPSIS  
             Simple function to connect into Exchange
@@ -7,7 +7,7 @@
             This function will allow you to connect with Exchange using PowerShell.
 
         .NOTES  
-            File Name    : Connect-Exchange.ps1
+            File Name    : Invoke-ConnectExchange.ps1
             Author       : Thomas ILLIET, contact@thomas-illiet.fr
             Date	     : 2017-08-01
             Last Update  : 2017-08-01
