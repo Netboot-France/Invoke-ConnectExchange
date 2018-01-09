@@ -13,16 +13,8 @@ This function will allow you to connect with Exchange using PowerShell.
   - **Author**      : Thomas ILLIET, contact@thomas-illiet.fr
   - **Date**        : 2017-08-01
   - **Last Update** : 2017-08-01
-  - **Test Date**   : 2017-10-17
-  - **Version**     : 2.0.0
-
-## REQUIRE
-  - Function :
-    - New-sleep
-      - https://github.com/thomas-illiet/Powershell/tree/master/3-Tools/2-New-Sleep
-    - Test-ExchangeSession
-      - https://github.com/thomas-illiet/Powershell/tree/master/2-Office365/2-ExchangeOnline/1-Connect
-
+  - **Test Date**   : 2018-01-09
+  - **Version**     : 1.0.0
 
 ## EXAMPLE
 ```
