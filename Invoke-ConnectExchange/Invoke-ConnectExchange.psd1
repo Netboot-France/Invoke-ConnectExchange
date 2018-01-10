@@ -4,7 +4,7 @@
 RootModule = 'Invoke-ConnectExchange.psm1'
 
 # Version number of this module.
-ModuleVersion = '1.0.0'
+ModuleVersion = '1.1.0'
 
 # ID used to uniquely identify this module
 GUID = '5b658ad8-d1f9-4ab2-8505-89bc7c8615b0'
@@ -28,7 +28,7 @@ FunctionsToExport = @('Test-ExchangeSession', 'Invoke-ConnectExchange')
 CmdletsToExport = ''
 
 # Variables to export from this module
-VariablesToExport = '*'
+VariablesToExport = ''
 
 # Aliases to export from this module, for best performance, do not use wildcards and do not delete the entry, use an empty array if there are no aliases to export.
 AliasesToExport = ''

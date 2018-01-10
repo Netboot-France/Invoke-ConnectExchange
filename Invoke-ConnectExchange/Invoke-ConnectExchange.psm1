@@ -11,7 +11,7 @@ Function Invoke-ConnectExchange {
             Date         : 2017-08-01
             Last Update  : 2017-08-01
             Test Date    : 2017-10-17
-            Version      : 2.0.0
+            Version      : 2.1.0
         
         .PARAMETER config
             Configuration Array
@@ -65,61 +65,63 @@ Function Invoke-ConnectExchange {
         [Array]$Config
     )
 
-    write-debug "++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"
-    write-debug "+ Connect to Exchange"
-    write-debug "++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"
-    
-    # Load Credential
-    if(-not([string]::IsNullOrEmpty($Config.PasswordFile)))
-    {
-        if(-not([string]::IsNullOrEmpty($Config.KeyFile)))
+    Try {
+
+        # Load Credential
+        if(-not([string]::IsNullOrEmpty($Config.PasswordFile)))
         {
-            $Methode = "SecureString file + Key"
-            $Credential = New-Object -TypeName System.Management.Automation.PSCredential -ArgumentList $Config.Identity, (Get-Content $Config.PasswordFile | ConvertTo-SecureString -Key (Get-Content $Config.KeyFile))
-        } # END Credential with Key File
+            if(-not([string]::IsNullOrEmpty($Config.KeyFile)))
+            {
+                $Methode = "SecureString file + Key"
+                $Credential = New-Object -TypeName System.Management.Automation.PSCredential -ArgumentList $Config.Identity, (Get-Content $Config.PasswordFile | ConvertTo-SecureString -Key (Get-Content $Config.KeyFile))
+            } # END Credential with Key File
+            else
+            {
+                $Methode = "SecureString file"
+                $Credential = New-Object -TypeName System.Management.Automation.PSCredential -ArgumentList $Config.Identity, (Get-Content $Config.PasswordFile | ConvertTo-SecureString)
+            } # END Credential without Key File
+        }
         else
         {
-            $Methode = "SecureString file"
-            $Credential = New-Object -TypeName System.Management.Automation.PSCredential -ArgumentList $Config.Identity, (Get-Content $Config.PasswordFile | ConvertTo-SecureString)
-        } # END Credential without Key File
-    }
-    else
-    {
-        $Methode = "Plain password"
-        $Secpasswd = ConvertTo-SecureString $Config.Password -AsPlainText -Force
-        $Credential = New-Object -TypeName System.Management.Automation.PSCredential ($Config.Identity, $secpasswd)
-    } # END Credential with plain password
+            $Methode = "Plain password"
+            $Secpasswd = ConvertTo-SecureString $Config.Password -AsPlainText -Force
+            $Credential = New-Object -TypeName System.Management.Automation.PSCredential ($Config.Identity, $secpasswd)
+        } # END Credential with plain password
 
-    # Connect to Exchange
-    $error.clear();
-    Write-Debug "| + Attempting Connection to Exchange Online with $Methode"
-    $SessionOptions = New-PSSessionOption -SkipCACheck -SkipCNCheck -SkipRevocationCheck 
-    $Session = New-PSSession -Name $Config.SessionName -ConfigurationName Microsoft.Exchange -ConnectionUri $Config.ConnectionUri -Credential $Credential -Authentication $Config.Authentication -SessionOption $SessionOptions -AllowRedirection -ErrorAction SilentlyContinue
-    
-    
-    # Import Session
-    if(-not([string]::IsNullOrEmpty($Config.Cmdlet)))
-    {
-        Import-PSSession $Session -AllowClobber -CommandName $Config.Cmdlet | Out-Null
-    } else {
-        Import-PSSession $Session -AllowClobber| Out-Null
-    } # END Cmdlet selection
+        # Connect to Exchange
+        $error.clear();
+        Write-Debug "Attempting Connection to Exchange Online with $Methode"
+        $SessionOptions = New-PSSessionOption -SkipCACheck -SkipCNCheck -SkipRevocationCheck 
+        $Session = New-PSSession -Name $Config.SessionName -ConfigurationName Microsoft.Exchange -ConnectionUri $Config.ConnectionUri -Credential $Credential -Authentication $Config.Authentication -SessionOption $SessionOptions -AllowRedirection
+        
+        # Import Session
+        Write-Debug "Importing Exchange Session"
+        if(-not([string]::IsNullOrEmpty($Config.Cmdlet)))
+        {
+            Import-Module (Import-PSSession $Session -AllowClobber -CommandName $Config.Cmdlet -DisableNameChecking ) -Global -DisableNameChecking
+        } else {
+            Import-Module (Import-PSSession $Session -AllowClobber -DisableNameChecking) -Global -DisableNameChecking
+        } # END Cmdlet selection
 
-    # Error Management
-    If ($error)
-    {
-        Write-warning "| + Unable to import Exchange PS session : $Error"
+        # Error Management
+        If ($error)
+        {
+            Write-warning "Unable to import Exchange PS session : $Error"
+            return $false
+        }#END Error
+        else
+        {
+            Write-Debug "Connected to Exchange"
+
+            # Set the Start time for the current session 
+            Set-Variable -Scope 'Global' -Name 'ExchangeSessionStartTime' -Value (Get-Date)
+
+            return $true
+        }#END Success
+    } Catch {
+        Write-Error "Unable to connect to Exchange $_"
         return $false
-    }#END Error
-    else
-    {
-        Write-Debug "| + Connected to Exchange"
-
-        # Set the Start time for the current session
-        Set-Variable -Scope script -Name SessionStartTime -Value (Get-Date)
-    
-        return $true
-    }#END Success
+    }
 }
 
 Function Test-ExchangeSession {
@@ -131,8 +133,8 @@ Function Test-ExchangeSession {
         Author      : Thomas ILLIET, contact@thomas-illiet.fr
         Date        : 2017-08-01
         Last Update : 2017-08-01
-        Test Date   :
-        Version     : 1.0.0 
+        Test Date   : 2018-01-10
+        Version     : 1.1.0 
         
     .PARAMETER Config
         Exchange connexion config
@@ -199,7 +201,7 @@ Function Test-ExchangeSession {
     }
 
     # If we have looped thru objects for an amount of time gt our reset seconds then tear the session down and recreate it
-    elseif (($ObjectTime - $SessionStartTime).totalseconds -gt $Reconnect){
+    elseif (($ObjectTime - $ExchangeSessionStartTime    ).totalseconds -gt $Reconnect){
         write-debug "| ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"
         write-debug "| + Test Exchange Session"
         write-debug "| ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"
