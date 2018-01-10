@@ -18,7 +18,7 @@ Function Invoke-ConnectExchange {
 
         .EXAMPLE 
             #----------------------------------------------
-            #  With Plain Password
+            # With Plain Password
             #----------------------------------------------
             $ExchangeConfig =@{
                 Identity       = "unicorn@microsoft.fr"
@@ -28,7 +28,7 @@ Function Invoke-ConnectExchange {
                 Cmdlet         = @('Set-Mailbox')
                 SessionName    = "Exchange"
             }
-            Connect-Exchange -Config $ExchangeConfig
+            Invoke-ConnectExchange -Config $ExchangeConfig
 
         .EXAMPLE
             #----------------------------------------------
@@ -42,7 +42,7 @@ Function Invoke-ConnectExchange {
                 Cmdlet         = @('Set-Mailbox')
                 SessionName    = "Exchange"
             }
-            Connect-Exchange -Config $ExchangeConfig
+            Invoke-ConnectExchange -Config $ExchangeConfig
 
         .EXAMPLE
             #----------------------------------------------
@@ -57,7 +57,7 @@ Function Invoke-ConnectExchange {
                 Cmdlet         = @('Set-Mailbox')
                 SessionName    = "Exchange"
             }
-            Connect-Exchange -Config $ExchangeConfig
+            Invoke-ConnectExchange -Config $ExchangeConfig
 
     #>
     Param (

@@ -14,7 +14,7 @@ This function will allow you to connect with Exchange using PowerShell.
   - **Date**        : 2017-08-01
   - **Last Update** : 2017-08-01
   - **Test Date**   : 2018-01-09
-  - **Version**     : 1.0.0
+  - **Version**     : 1.1.0
 
 ## EXAMPLE
 ```
